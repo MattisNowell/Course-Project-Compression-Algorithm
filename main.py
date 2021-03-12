@@ -7,8 +7,9 @@ def getFileCharNumber(textFile) -> int :
     """
     text = textFile.read()
     number = len(text)
+	#The text is deleted as text files to be compressed are often quite voluminous. 
     del text 
-    
+	
     return number
 
 def countCharsInLines(path:str) -> list :
@@ -21,15 +22,21 @@ def countCharsInLines(path:str) -> list :
 	with open(path) as file:
 		line = file.readline()
 		while line :
+			#Here is a loop that counts the characters in a line and stores the data in a dictionary with the key being 
+			#the character and the value being the number of apparition in the line (the data is unordered):
 			charTable = {}
 			for char in line:
 				if char in charTable :
 					charTable[char] = charTable[char]+1
 				else :
 					charTable[char] = 1
+			#The dictionary containing the data of a line is stored in a list that will eventually contain dictionaries for all
+			#lines in the file:
 			macroTable.append(charTable)
+			#The program passes on to the next line in file to repeat the process:
 			line = file.readline()
 		file.close()
+		del line
 	
 	return macroTable
 
@@ -42,6 +49,8 @@ def calculatePercentage(textFile, data:dict) -> dict:
 
     percentageDict = {}
     
+	#Classic percentage calculation using the frequency of the concerned character and the total number of characters in the 
+	#text file:
     for char in data:
         percentageDict[char] = (data[char]/ totalCharNumber)*100
         
