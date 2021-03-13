@@ -1,51 +1,54 @@
 from collections import Counter 
 import sys
 
-def getFileCharNumber(textFile) -> int :
-    """
-    Returns the number of characters contained in a given text file.
-    """
-    text = textFile.read()
-    number = len(text)
-	#The text is deleted as text files to be compressed are often quite voluminous. 
-    del text 
+def getFileCharNumber(openedTextFile) -> int :
+	"""
+	Returns the number of characters contained in a given text file.
+	"""
+	openedTextFile.seek(0, 0)
 	
-    return number
+	text = openedTextFile.read()
+	number = len(text)
+	#The text is deleted as text files to be compressed are often quite voluminous. 
+	del text 
+	
+	return number
 
-def countCharsInLines(path:str) -> list :
+def countCharsInLines(openedTextFile) -> list :
 	"""
 	Returns a list containing dictionaries with the number of each character for each line.
 	Each dictionary contains the data for a specific line.
 	"""
+	openedTextFile.seek(0, 0)
+
 	macroTable = []
-    
-	with open(path) as file:
+	
+	
+	line = file.readline()
+	while line :
+		#Here is a loop that counts the characters in a line and stores the data in a dictionary with the key being 
+		#the character and the value being the number of apparition in the line (the data is unordered):
+		charTable = {}
+		for char in line:
+			if char in charTable :
+				charTable[char] = charTable[char]+1
+			else :
+				charTable[char] = 1
+		#The dictionary containing the data of a line is stored in a list that will eventually contain dictionaries for all
+		#lines in the file:
+		macroTable.append(charTable)
+		#The program passes on to the next line in file to repeat the process:
 		line = file.readline()
-		while line :
-			#Here is a loop that counts the characters in a line and stores the data in a dictionary with the key being 
-			#the character and the value being the number of apparition in the line (the data is unordered):
-			charTable = {}
-			for char in line:
-				if char in charTable :
-					charTable[char] = charTable[char]+1
-				else :
-					charTable[char] = 1
-			#The dictionary containing the data of a line is stored in a list that will eventually contain dictionaries for all
-			#lines in the file:
-			macroTable.append(charTable)
-			#The program passes on to the next line in file to repeat the process:
-			line = file.readline()
-		file.close()
-		del line
+	del line
 	
 	return macroTable
 
-def calculatePercentage(textFile, data:dict) -> dict:
+def calculatePercentage(openedTextFile, data:dict) -> dict:
     """
     Calculates the percentage of each character in a given text file. 
     Returns the data in a dictionary.
     """
-    totalCharNumber = getFileCharNumber(textFile)
+    totalCharNumber = getFileCharNumber(openedTextFile)
 
     percentageDict = {}
     
@@ -65,10 +68,11 @@ if __name__ == "__main__":
 		print("Command 'python3 main.py {action: 'compress'/'decompress'/'help'} {file path: not required if action=help}' ")
 		
 	elif sys.argv[1] == 'compress':
-	
-		macroTable = countCharsInLines(sys.argv[2])
-    
+
 		file = open(sys.argv[2])
+		
+		print("Loading and processing file characters...")
+		macroTable = countCharsInLines(file)
 		
 		#Because the function 'countCharsInLines' returns a list of dictionaries, it is necessary 
 		#to merge all dictionaries into a single data structure.
