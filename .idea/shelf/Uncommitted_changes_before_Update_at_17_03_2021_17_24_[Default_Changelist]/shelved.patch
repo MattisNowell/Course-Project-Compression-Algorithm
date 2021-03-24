@@ -1,0 +1,107 @@
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from collections import Counter\r\nimport sys\r\n\r\n\r\ndef get_file_char_number(opened_text_file) -> int:\r\n    \"\"\"\r\n\tReturns the number of characters contained in a given text file.\r\n\t\"\"\"\r\n    opened_text_file.seek(0, 0)\r\n\r\n    text = opened_text_file.read()\r\n    number = len(text)\r\n    # The text is deleted as text files to be compressed are often quite voluminous.\r\n    del text\r\n\r\n    return number\r\n\r\n\r\ndef count_chars_in_lines(openedTextFile) -> list:\r\n    \"\"\"\r\n\tReturns a list containing dictionaries with the number of each character for each line.\r\n\tEach dictionary contains the data for a specific line.\r\n\t\"\"\"\r\n    openedTextFile.seek(0, 0)\r\n\r\n    macro_table = []\r\n\r\n    line = file.readline()\r\n    while line:\r\n        # Here is a loop that counts the characters in a line and stores the data in a dictionary with the key being\r\n        # the character and the value being the number of apparition in the line (the data is unordered):\r\n        char_table = {}\r\n        for char in line:\r\n            if char in char_table:\r\n                char_table[char] = char_table[char] + 1\r\n            else:\r\n                char_table[char] = 1\r\n        # The dictionary containing the data of a line is stored in a list that will eventually contain dictionaries\r\n        # for all lines in the file:\r\n        macro_table.append(char_table)\r\n        # The program passes on to the next line in file to repeat the process:\r\n        line = file.readline()\r\n    del line\r\n\r\n    return macro_table\r\n\r\n\r\ndef calculate_percentage(opened_text_file, data: dict) -> dict:\r\n    \"\"\"\r\n    Calculates the percentage of each character in a given text file. \r\n    Returns the data in a dictionary.\r\n    \"\"\"\r\n    total_char_number = get_file_char_number(opened_text_file)\r\n\r\n    percentage_dict = {}\r\n\r\n    # Classic percentage calculation using the frequency of the concerned character and the total number of\r\n    # characters in the text file:\r\n    for char in data:\r\n        percentage_dict[char] = (data[char] / total_char_number) * 100\r\n\r\n    return percentage_dict\r\n\r\n\r\nif __name__ == \"__main__\":\r\n\r\n    if sys.argv[1] == 'help':\r\n\r\n        print(\"Command 'python3 main.py {action: 'compress'/'decompress'/'help'} {file path: not required if \"\r\n              \"action=help}' \")\r\n\r\n    elif sys.argv[1] == 'compress':\r\n\r\n        file = open(sys.argv[2])\r\n\r\n        print(\"Loading and processing file characters...\")\r\n        macroTable = count_chars_in_lines(file)\r\n\r\n        # Because the function 'countCharsInLines' returns a list of dictionaries, it is necessary\r\n        # to merge all dictionaries into a single data structure.\r\n        # This is easily done with the class Counter but requires multiple conversions as follows :\r\n        macroCounter = Counter()\r\n        for dictionary in macroTable:\r\n            dictToCounter = Counter(dictionary)\r\n            macroCounter = macroCounter + dictToCounter\r\n        macroDictionary = dict(macroCounter)\r\n\r\n        # To facilitate the rest of the coding, operations will be made with the probabilities of\r\n        # each character rather than their number of apparition. The corresponding data is fetched\r\n        # using the 'calculatePercentage' function:\r\n        percentageDict = calculate_percentage(file, macroDictionary)\r\n\r\n        # The data requires to be sorted from less frequent to most frequent.\r\n        # This is done with the function sorted but this returns a list of only chars sorted by their percentage\r\n        # The date must then be transferred to a dictionary containing both the sorted char and their percentage\r\n        sortedPercentageList = sorted(percentageDict, key=percentageDict.get)\r\n        sortedPercentageDict = {}\r\n        for char in sortedPercentageList:\r\n            sortedPercentageDict[char] = percentageDict[char]\r\n        print(sortedPercentageDict)\r\n\r\n    elif sys.argv[1] == 'decompress':\r\n\r\n        print(\"Under development...\")\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision 47f71ab59283d291a610c4f9c3daebc6adc813d4)
++++ b/main.py	(date 1616001525101)
+@@ -1,11 +1,13 @@
+ from collections import Counter
++from node import Node
+ import sys
++from typing import List
+ 
+ 
+ def get_file_char_number(opened_text_file) -> int:
+     """
+-	Returns the number of characters contained in a given text file.
+-	"""
++    Returns the number of characters contained in a given text file.
++    """
+     opened_text_file.seek(0, 0)
+ 
+     text = opened_text_file.read()
+@@ -16,12 +18,12 @@
+     return number
+ 
+ 
+-def count_chars_in_lines(openedTextFile) -> list:
++def count_chars_in_lines(opened_text_file) -> list:
+     """
+-	Returns a list containing dictionaries with the number of each character for each line.
+-	Each dictionary contains the data for a specific line.
+-	"""
+-    openedTextFile.seek(0, 0)
++    Returns a list containing dictionaries with the number of each character for each line. Each dictionary contains the
++    data for a specific line.
++    """
++    opened_text_file.seek(0, 0)
+ 
+     macro_table = []
+ 
+@@ -30,11 +32,11 @@
+         # Here is a loop that counts the characters in a line and stores the data in a dictionary with the key being
+         # the character and the value being the number of apparition in the line (the data is unordered):
+         char_table = {}
+-        for char in line:
+-            if char in char_table:
+-                char_table[char] = char_table[char] + 1
++        for CHAR in line:
++            if CHAR in char_table:
++                char_table[CHAR] = char_table[CHAR] + 1
+             else:
+-                char_table[char] = 1
++                char_table[CHAR] = 1
+         # The dictionary containing the data of a line is stored in a list that will eventually contain dictionaries
+         # for all lines in the file:
+         macro_table.append(char_table)
+@@ -56,8 +58,8 @@
+ 
+     # Classic percentage calculation using the frequency of the concerned character and the total number of
+     # characters in the text file:
+-    for char in data:
+-        percentage_dict[char] = (data[char] / total_char_number) * 100
++    for CHAR in data:
++        percentage_dict[CHAR] = (data[CHAR] / total_char_number) * 100
+ 
+     return percentage_dict
+ 
+@@ -99,6 +101,35 @@
+             sortedPercentageDict[char] = percentageDict[char]
+         print(sortedPercentageDict)
+ 
++        # As the Node class constructor verifies the parameters of the created object to decide if it should treat it as
++        # a base node corresponding to a specific character, or as a composed node built from two other nodes, it is
++        # required to generate these base nodes before hand with each their needed data. The base nodes will be stored
++        # in a list as follows:
++        base_node_list: List[Node] = []
++        for char in sortedPercentageDict:
++            base_node_list.append(Node(character=char, probability=sortedPercentageDict.get(char)))
++
++        # Once the base nodes are created, we can created the Huffman Tree based on them. This algorithm eventually
++        # leads to a list containing a single Node with a probability of 100% that points to all children nodes.
++        node_list = base_node_list
++        while len(node_list) != 1:
++            node_list.append(Node(node_list[0], node_list[1]))
++            node_list.pop(1)
++            node_list.pop(0)
++            node_list.sort(key=lambda x: x.get_probability())
++        top_node = node_list[0]
++
++        current_node: Node = top_node
++        binary_representation: str = ''
++        for i in range(1):
++            current_node = current_node.first_child_node
++            binary_representation = binary_representation + str(current_node.binary_id)
++        print(current_node.chars, current_node.probability)
++        for i in range(5):
++            current_node = current_node.second_child_node
++            binary_representation = binary_representation + str(current_node.binary_id)
++        print(current_node.chars, current_node.probability, binary_representation)
++
+     elif sys.argv[1] == 'decompress':
+ 
+         print("Under development...")
